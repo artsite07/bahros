@@ -2,391 +2,572 @@
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Aji Chat</title>
-  <link rel="icon" type="image/png" href="1.png">
-  <meta name="theme-color" content="#075E54" />
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Aji Chat</title>
+    <link rel="icon" type="image/png" href="1.png">
+    <!-- Tema warna untuk status bar browser di Android (Dark Mode) -->
+    <meta name="theme-color" content="#202c33" />
+    <style>
+        /* Skema Warna Dark Mode */
+        :root {
+            --bg-primary: #121212; /* Warna latar belakang utama */
+            --bg-secondary: #0b141a; /* Latar Belakang Chat Area */
+            --bg-header-input: #202c33;
+            --text-light: #ffffff;
+            --text-dark: #e0e0e0;
+            --text-subtle: #aab8c2;
+            --bubble-self: #005c4b; /* Pesan Saya (Hijau gelap) */
+            --bubble-other: #202c33; /* Pesan Lawan (Abu-abu gelap) */
+            --input-field: #2a3942;
+            --border-color: #3a4652;
+            --accent-blue: #34b7f1;
+            --action-clear: #d9534f;
+        }
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      font-family: "Segoe UI", sans-serif;
-      background: #ece5dd;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-    header {
-      background: #075E54;
-      color: white;
-      padding: 0.8rem 1rem;
-      font-weight: bold;
-      font-size: 1.1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background: var(--bg-primary);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-    #clear-btn {
-      background: #c62828;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
+        header {
+            background: var(--bg-header-input);
+            color: var(--text-light);
+            padding: 0.8rem 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
 
-    #chat-box {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      scroll-behavior: smooth;
-      background: url("https://i.ibb.co/4YZRcdt/wa-bg.png") repeat;
-      background-size: 300px;
-    }
+        #clear-btn {
+            background: var(--action-clear);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        #clear-btn:hover { background: #c9302c; }
 
-    #chat-box::-webkit-scrollbar {
-      display: none;
-    }
+        #chat-box {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            scroll-behavior: smooth;
+            /* Latar belakang polos Dark Mode, gambar dihapus */
+            background: var(--bg-secondary);
+        }
 
-    .pesan-ku,
-    .pesan-lawan {
-      max-width: 70%;
-      padding: 0.6rem 0.9rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      line-height: 1.3;
-      position: relative;
-      transition: transform 0.2s ease;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
+        #chat-box::-webkit-scrollbar {
+            display: none;
+        }
 
-    .pesan-ku {
-      align-self: flex-end;
-      background: #dcf8c6;
-      color: #111;
-      border-top-right-radius: 0;
-    }
+        .pesan-ku,
+        .pesan-lawan {
+            max-width: 70%;
+            padding: 0.6rem 0.9rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.2);
+        }
 
-    .pesan-lawan {
-      align-self: flex-start;
-      background: #fff;
-      color: #111;
-      border-top-left-radius: 0;
-    }
+        .pesan-ku {
+            align-self: flex-end;
+            background: var(--bubble-self);
+            color: var(--text-light);
+            border-top-right-radius: 4px;
+        }
 
-    .hapus-btn,
-    .reply-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      border: none;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      font-size: 14px;
-      display: none;
-      cursor: pointer;
-      background: #075E54;
-      color: white;
-    }
+        .pesan-lawan {
+            align-self: flex-start;
+            background: var(--bubble-other);
+            color: var(--text-light);
+            border-top-left-radius: 4px;
+        }
+        
+        /* Gaya saat tools (hapus/balas) ditampilkan */
+        .pesan-ku:hover, .pesan-lawan:hover,
+        .pesan-ku.pesan-show-tools, .pesan-lawan.pesan-show-tools {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
 
-    .hapus-btn {
-      right: -65px;
-    }
+        .hapus-btn,
+        .reply-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            display: none;
+            cursor: pointer;
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
 
-    .reply-btn {
-      right: -35px;
-    }
+        .hapus-btn { right: -65px; }
+        .reply-btn { right: -35px; }
+        .pesan-lawan .reply-btn { left: -35px; right: auto; }
 
-    .pesan-lawan .reply-btn {
-      left: -30px;
-      right: auto;
-    }
+        .pesan-ku.pesan-show-tools { transform: translateX(-70px); }
+        .pesan-lawan.pesan-show-tools { transform: translateX(40px); }
 
-    .pesan-ku.pesan-show-tools {
-      transform: translateX(-70px);
-    }
+        .pesan-ku.pesan-show-tools .hapus-btn,
+        .pesan-ku.pesan-show-tools .reply-btn,
+        .pesan-lawan.pesan-show-tools .reply-btn {
+            display: block;
+        }
 
-    .pesan-lawan.pesan-show-tools {
-      transform: translateX(40px);
-    }
+        .reply-bubble {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 6px;
+            margin-bottom: 4px;
+        }
 
-    .pesan-ku.pesan-show-tools .hapus-btn,
-    .pesan-ku.pesan-show-tools .reply-btn,
-    .pesan-lawan.pesan-show-tools .reply-btn {
-      display: block;
-    }
+        #reply-preview {
+            display: none;
+            background: var(--input-field);
+            border-left: 4px solid var(--accent-blue);
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin: 0 0.5rem;
+            border-radius: 8px;
+            width: calc(100% - 1rem);
+        }
 
-    .reply-bubble {
-      font-size: 0.8rem;
-      color: #555;
-      border-left: 3px solid #34b7f1;
-      padding-left: 4px;
-      margin-bottom: 4px;
-    }
+        #reply-preview span {
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
 
-    #reply-preview {
-      display: none;
-      background: #f0f0f0;
-      border-left: 4px solid #34b7f1;
-      padding: 0.5rem;
-      font-size: 0.9rem;
-      color: #333;
-      margin: 0 0.5rem;
-      border-radius: 4px;
-    }
+        #reply-preview button {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--text-subtle);
+        }
 
-    #reply-preview span {
-      font-weight: bold;
-      color: #075E54;
-    }
+        form {
+            display: flex;
+            align-items: flex-end;
+            padding: 0.5rem;
+            background: var(--bg-header-input);
+            border-top: 1px solid var(--border-color);
+            flex-direction: column;
+            gap: 0.3rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.4);
+        }
 
-    #reply-preview button {
-      float: right;
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      color: #888;
-    }
+        .input-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
 
-    form {
-      display: flex;
-      align-items: flex-end;
-      padding: 0.5rem;
-      background: #f0f0f0;
-      border-top: 1px solid #ddd;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
+        textarea {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 25px;
+            background: var(--input-field);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            line-height: 1.4;
+            overflow-y: auto;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+            width: 100%; 
+        }
+        textarea::placeholder {
+            color: var(--text-subtle);
+        }
+        
+        /* Tombol Kirim Dihapus */
+        button[type="submit"] {
+            display: none;
+        }
 
-    .input-row {
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
+        /* Popup konfirmasi */
+        #confirm-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-    textarea {
-      flex: 1;
-      padding: 0.6rem 1rem;
-      border: none;
-      border-radius: 25px;
-      background: #fff;
-      color: #111;
-      font-size: 1rem;
-      outline: none;
-      resize: none;
-      max-height: 120px;
-      line-height: 1.4;
-      overflow-y: auto;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
+        #confirm-popup div {
+            background: var(--input-field);
+            color: var(--text-light);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
 
-    button[type="submit"] {
-      margin-left: 0.5rem;
-      background: #25d366;
-      color: white;
-      border: none;
-      padding: 0.6rem 0.9rem;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transition: background 0.2s;
-    }
+        #confirm-popup button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        #confirm-popup button:hover { opacity: 0.8; }
 
-    button[type="submit"]:hover {
-      background: #20b954;
-    }
-  </style>
+        #confirm-yes { background: var(--action-clear); }
+        #confirm-no { background: #6c757d; }
+
+        /* Toast notifikasi */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--input-field);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 4px;
+            padding: 10px;
+            position: fixed;
+            z-index: 10000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <span>Aji Chat</span>
-    <button id="clear-btn">Hapus Semua</button>
-  </header>
-  <main id="chat-box"></main>
-  <form id="chat-form" autocomplete="off">
-    <div id="reply-preview"></div>
-    <div class="input-row">
-      <textarea id="message-input" placeholder="Ketik pesan..." rows="1" required></textarea>
-      <button type="submit">➤</button>
+    <header>
+        <span>Aji Chat (Dark Mode)</span>
+        <button id="clear-btn">Hapus Semua</button>
+    </header>
+    <main id="chat-box"></main>
+    
+    <form id="chat-form" autocomplete="off">
+        <div id="reply-preview"></div>
+        <div class="input-row">
+            <!-- Input dengan autofocus dan pengiriman via Enter -->
+            <textarea id="message-input" placeholder="Ketik pesan..." rows="1" required autofocus></textarea>
+        </div>
+    </form>
+
+    <!-- Custom Popup Konfirmasi Hapus -->
+    <div id="confirm-popup">
+        <div>
+            <p>Yakin mau hapus semua pesan di ruang ini?</p>
+            <button id="confirm-yes">Ya, Hapus</button>
+            <button id="confirm-no">Batal</button>
+        </div>
     </div>
-  </form>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDXt7Jh0W-d5blhNoi3ocRdw4OyAY7fd3c",
-      authDomain: "pesan-30bab.firebaseapp.com",
-      databaseURL: "https://pesan-30bab-default-rtdb.firebaseio.com",
-      projectId: "pesan-30bab",
-      storageBucket: "pesan-30bab.appspot.com",
-      messagingSenderId: "973488115942",
-      appId: "1:973488115942:web:0a8383a7a7b03aa9ba6b27"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    <!-- Toast Notifikasi -->
+    <div id="toast"></div>
 
-    const username = "Aji";
-    const roomId = "room1";
-
-    const chatBox = document.getElementById("chat-box");
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("message-input");
-    const replyPreview = document.getElementById("reply-preview");
-    const clearBtn = document.getElementById("clear-btn");
-
-    let replyTo = null;
-
-    input.addEventListener("input", () => {
-      input.style.height = "auto";
-      input.style.height = (input.scrollHeight) + "px";
-    });
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        form.requestSubmit();
-      }
-    });
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (message.length > 0 && message.length <= 500) {
-        db.ref("ruang/" + roomId).push({
-          nama: username,
-          teks: message,
-          replyTo: replyTo,
-          waktu: Date.now()
-        });
-        input.value = "";
-        input.style.height = "auto";
-        replyTo = null;
-        replyPreview.style.display = "none";
-      }
-    });
-
-    function createMessageElement(data, key) {
-      const el = document.createElement("div");
-      el.className = data.nama === username ? "pesan-ku" : "pesan-lawan";
-      el.dataset.key = key;
-
-      if (data.replyTo) {
-        const replyEl = document.createElement("div");
-        replyEl.className = "reply-bubble";
-        replyEl.textContent = data.replyTo.nama + ": " + data.replyTo.teks;
-        el.appendChild(replyEl);
-      }
-
-      const teksEl = document.createElement("div");
-      teksEl.textContent = data.teks;
-      el.appendChild(teksEl);
-
-      if (data.nama === username) {
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "✖";
-        delBtn.className = "hapus-btn";
-        delBtn.addEventListener("click", () => {
-          db.ref("ruang/" + roomId).child(key).remove();
-        });
-        el.appendChild(delBtn);
-      }
-
-      const replyBtn = document.createElement("button");
-      replyBtn.textContent = "↩";
-      replyBtn.className = "reply-btn";
-      replyBtn.addEventListener("click", () => {
-        replyTo = {
-          nama: data.nama,
-          teks: data.teks
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script>
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXt7Jh0W-d5blhNoi3ocRdw4OyAY7fd3c",
+            authDomain: "pesan-30bab.firebaseapp.com",
+            databaseURL: "https://pesan-30bab-default-rtdb.firebaseio.com",
+            projectId: "pesan-30bab",
+            storageBucket: "pesan-30bab.appspot.com",
+            messagingSenderId: "973488115942",
+            appId: "1:973488115942:web:0a8383a7a7b03aa9ba6b27"
         };
-        replyPreview.innerHTML = "";
-        const span = document.createElement("span");
-        span.textContent = data.nama;
-        replyPreview.appendChild(span);
-        replyPreview.appendChild(document.createTextNode(": " + data.teks));
-        const cancelBtn = document.createElement("button");
-        cancelBtn.textContent = "✖";
-        cancelBtn.onclick = cancelReply;
-        replyPreview.appendChild(cancelBtn);
-        replyPreview.style.display = "block";
-      });
-      el.appendChild(replyBtn);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-      el.addEventListener("click", () => {
-        el.classList.toggle("pesan-show-tools");
-      });
+        const username = "Aji";
+        const roomId = "room1";
 
-      return el;
-    }
+        const chatBox = document.getElementById("chat-box");
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("message-input");
+        const replyPreview = document.getElementById("reply-preview");
+        const clearBtn = document.getElementById("clear-btn");
+        
+        // Elemen Custom Popup & Toast
+        const popup = document.getElementById("confirm-popup");
+        const yesBtn = document.getElementById("confirm-yes");
+        const noBtn = document.getElementById("confirm-no");
+        const toast = document.getElementById("toast");
 
-    function cancelReply() {
-      replyTo = null;
-      replyPreview.style.display = "none";
-    }
 
-    // Perbaikan auto scroll
-    let firstLoad = true;
-    const pesanRef = db.ref("ruang/" + roomId).limitToLast(50);
+        let replyTo = null;
 
-    pesanRef.on("child_added", (snap) => {
-      const data = snap.val();
-      const key = snap.key;
-      const el = createMessageElement(data, key);
-
-      chatBox.appendChild(el);
-
-      if (!firstLoad) {
-        const nearBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 50;
-        if (nearBottom) chatBox.scrollTop = chatBox.scrollHeight;
-      }
-
-      if (chatBox.children.length > 50) {
-        const first = chatBox.firstChild;
-        if (first && first.dataset.key) {
-          db.ref("ruang/" + roomId).child(first.dataset.key).remove();
+        // Auto resize textarea
+        input.addEventListener("input", () => {
+            input.style.height = "auto";
+            input.style.height = (input.scrollHeight) + "px";
+        });
+        
+        /**
+         * Logika Pengiriman Pesan
+         */
+        function submitMessage() {
+            const message = input.value.trim();
+            if (message.length > 0 && message.length <= 500) {
+                db.ref("ruang/" + roomId).push({
+                    nama: username,
+                    teks: message,
+                    replyTo: replyTo,
+                    waktu: Date.now()
+                });
+                
+                // Reset dan fokus otomatis
+                input.value = "";
+                input.style.height = "auto";
+                replyTo = null;
+                replyPreview.style.display = "none";
+                chatBox.scrollTop = chatBox.scrollHeight;
+                input.focus(); 
+            }
         }
-      }
-    });
 
-    // Setelah semua pesan awal selesai dimuat → scroll sekali ke bawah
-    pesanRef.once("value", () => {
-      chatBox.scrollTop = chatBox.scrollHeight;
-      firstLoad = false;
-    });
+        // MENGGANTI TOMBOL KIRIM DENGAN TOMBOL ENTER
+        input.addEventListener("keydown", (e) => {
+            // Cek jika tombol yang ditekan adalah Enter dan TIDAK bersamaan dengan Shift
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); 
+                submitMessage();
+            }
+        });
 
-    db.ref("ruang/" + roomId).on("child_removed", (snap) => {
-      const key = snap.key;
-      const el = chatBox.querySelector(`[data-key="${key}"]`);
-      if (el) el.remove();
-    });
+        
+        function createMessageElement(data, key) {
+            const el = document.createElement("div");
+            el.className = data.nama === username ? "pesan-ku" : "pesan-lawan";
+            el.dataset.key = key;
 
-    // Tombol hapus semua
-    clearBtn.addEventListener("click", () => {
-      if (confirm("Yakin mau hapus semua pesan di ruang ini?")) {
-        db.ref("ruang/" + roomId).remove();
-        chatBox.innerHTML = "";
-      }
-    });
-  </script>
+            if (data.replyTo) {
+                const replyEl = document.createElement("div");
+                replyEl.className = "reply-bubble";
+                const replyerName = data.replyTo.nama === username ? "Saya" : data.replyTo.nama;
+                replyEl.textContent = replyerName + ": " + data.replyTo.teks.substring(0, 30) + (data.replyTo.teks.length > 30 ? "..." : "");
+                el.appendChild(replyEl);
+            }
+
+            const teksEl = document.createElement("div");
+            teksEl.textContent = data.teks;
+            el.appendChild(teksEl);
+
+            if (data.nama === username) {
+                const delBtn = document.createElement("button");
+                delBtn.innerHTML = "&#x2716;"; // '✖'
+                delBtn.className = "hapus-btn";
+                delBtn.addEventListener("click", (event) => {
+                    event.stopPropagation(); // Mencegah toggle show tools saat klik hapus
+                    db.ref("ruang/" + roomId).child(key).remove();
+                });
+                el.appendChild(delBtn);
+            }
+
+            const replyBtn = document.createElement("button");
+            replyBtn.innerHTML = "&#x21a9;"; // '↩'
+            replyBtn.className = "reply-btn";
+            replyBtn.addEventListener("click", (event) => {
+                event.stopPropagation(); // Mencegah toggle show tools saat klik balas
+                replyTo = {
+                    nama: data.nama,
+                    teks: data.teks
+                };
+                replyPreview.innerHTML = "";
+                
+                const replyerName = data.nama === username ? "Saya" : data.nama;
+
+                const span = document.createElement("span");
+                span.textContent = "Balas ke " + replyerName;
+                replyPreview.appendChild(span);
+                replyPreview.appendChild(document.createTextNode(": " + data.teks.substring(0, 50) + (data.teks.length > 50 ? "..." : "")));
+                
+                const cancelBtn = document.createElement("button");
+                cancelBtn.innerHTML = "&#x2716;";
+                cancelBtn.onclick = cancelReply;
+                replyPreview.appendChild(cancelBtn);
+                replyPreview.style.display = "block";
+                
+                // Hilangkan semua tools pesan yang sedang terbuka
+                document.querySelectorAll('.pesan-show-tools').forEach(p => p.classList.remove('pesan-show-tools'));
+                input.focus();
+            });
+            el.appendChild(replyBtn);
+
+            // Toggle show tools on click
+            el.addEventListener("click", () => {
+                // Hilangkan tools pada pesan lain
+                document.querySelectorAll('.pesan-show-tools').forEach(p => {
+                    if (p !== el) {
+                        p.classList.remove('pesan-show-tools');
+                    }
+                });
+                el.classList.toggle("pesan-show-tools");
+            });
+
+
+            return el;
+        }
+
+        function cancelReply() {
+            replyTo = null;
+            replyPreview.style.display = "none";
+            input.focus(); 
+        }
+
+        // Perbaikan auto scroll & limit 50 pesan
+        let firstLoad = true;
+        const pesanRef = db.ref("ruang/" + roomId).limitToLast(50);
+
+        pesanRef.on("child_added", (snap) => {
+            const data = snap.val();
+            const key = snap.key;
+            const el = createMessageElement(data, key);
+
+            // Pastikan tidak menduplikat elemen
+            if (!chatBox.querySelector(`[data-key="${key}"]`)) {
+                chatBox.appendChild(el);
+            }
+
+            if (!firstLoad) {
+                const isUserAtBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 100;
+                // Auto scroll jika pesan baru dikirim pengguna sendiri atau jika pengguna sudah di dekat bawah
+                if (isUserAtBottom || data.nama === username) {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+
+            // Batasi 50 pesan di DOM
+            while (chatBox.children.length > 50) {
+                const first = chatBox.firstChild;
+                if (first && first.dataset.key) {
+                    // Hapus pesan lama dari DOM
+                    first.remove();
+                }
+            }
+        });
+
+        // Setelah semua pesan awal selesai dimuat → scroll sekali ke bawah dan fokus
+        pesanRef.once("value", () => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+            firstLoad = false;
+            input.focus(); // Fokus otomatis saat aplikasi siap
+        });
+
+        db.ref("ruang/" + roomId).on("child_removed", (snap) => {
+            const key = snap.key;
+            const el = chatBox.querySelector(`[data-key="${key}"]`);
+            if (el) el.remove();
+        });
+
+        
+        /**
+         * Logika Custom Toast
+         */
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.style.visibility = "visible";
+            toast.style.opacity = "1";
+            toast.style.bottom = "50px";
+
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.bottom = "30px";
+                setTimeout(() => {
+                    toast.style.visibility = "hidden";
+                }, 500);
+            }, 3000);
+        }
+
+        /**
+         * Logika Custom Popup Hapus Semua
+         */
+        clearBtn.addEventListener("click", () => {
+            popup.style.display = "flex";
+            yesBtn.focus();
+        });
+
+        yesBtn.addEventListener("click", () => {
+            db.ref("ruang/" + roomId).remove()
+                .then(() => {
+                    chatBox.innerHTML = "";
+                    popup.style.display = "none";
+                    showToast("✅ Semua pesan berhasil dihapus!");
+                    input.focus(); 
+                })
+                .catch(error => {
+                    console.error("Gagal menghapus pesan:", error);
+                    showToast("❌ Gagal menghapus. Cek konsol.");
+                });
+        });
+
+        noBtn.addEventListener("click", () => {
+            popup.style.display = "none";
+            input.focus(); 
+        });
+
+        // Kontrol Keyboard untuk Popup
+        document.addEventListener("keydown", (e) => {
+            if (popup.style.display === "flex") {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    yesBtn.click();
+                }
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    noBtn.click();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
