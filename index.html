@@ -4,30 +4,41 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Aji Chat</title>
+    <title>Aji Chat (Tampilan Virgo)</title>
     <link rel="icon" type="image/png" href="1.png">
-    <!-- Tema warna untuk status bar browser di Android (Dark Mode) -->
-    <meta name="theme-color" content="#202c33" />
+    <meta name="theme-color" content="#25D366" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <style>
-        /* Skema Warna Dark Mode */
+        /* Skema Warna Gaya WhatsApp Elegan (dari vpesan.html) */
         :root {
-            --bg-primary: #121212; /* Warna latar belakang utama */
-            --bg-secondary: #0b141a; /* Latar Belakang Chat Area */
-            --bg-header-input: #202c33;
-            --text-light: #ffffff;
-            --text-dark: #e0e0e0;
-            --text-subtle: #aab8c2;
-            --bubble-self: #005c4b; /* Pesan Saya (Hijau gelap) */
-            --bubble-other: #202c33; /* Pesan Lawan (Abu-abu gelap) */
-            --input-field: #2a3942;
-            --border-color: #3a4652;
-            --accent-blue: #34b7f1;
-            --action-clear: #d9534f;
+            /* --- WARNA AKSEN UTAMA (Hijau WA Elegan) --- */
+            --main-accent-color: #20BFA9; 
+            
+            /* --- Latar Belakang (Disesuaikan dengan WA) --- */
+            --bg-primary: #FFFFFF; /* Putih untuk latar belakang utama/form */
+            --bg-secondary: #ECE5DD; /* Latar belakang area chat */
+            
+            /* Bubble saya dan lawan sama */
+            --bubble-self: #FFFFFF; 
+            --bubble-other: #FFFFFF; 
+
+            --bg-header: var(--main-accent-color); 
+            --accent-main: var(--main-accent-color); 
+            
+            --text-main: #1F2C34; /* Teks gelap */
+            --text-subtle: #6D7B87; 
+            
+            --action-clear: #EF5350;
+            --input-field: #FFFFFF; 
+            
+            --shadow-soft: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --shadow-input: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            font-weight: 400;
         }
 
         html,
@@ -37,35 +48,39 @@
             height: 100%;
             width: 100%;
             background: var(--bg-primary);
-            color: var(--text-dark);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        header {
-            background: var(--bg-header-input);
-            color: var(--text-light);
-            padding: 0.8rem 1rem;
-            font-weight: bold;
-            font-size: 1.1rem;
+        /* Mengubah header menjadi title-bar */
+        #title-bar { 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        #clear-btn {
-            background: var(--action-clear);
-            border: none;
+            padding: 0rem 1.2rem;
+            background: var(--main-accent-color); 
+            border-bottom: 1px solid #EEEEEE;
+            font-size: 1.25rem;
+            font-weight: 500;
             color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            z-index: 10;
         }
-        #clear-btn:hover { background: #c9302c; }
+        
+        /* Tombol Hapus Semua (Ikon) - ID diubah dari #clear-btn menjadi #clear-all */
+        #clear-all {
+            background: none;
+            border: none;
+            color: white; 
+            padding: 8px;
+            border-radius: 9%;
+            cursor: pointer;
+            font-size: 1.5rem; 
+            line-height: 1;
+            transition: background 0.2s, transform 0.1s;
+        }
 
         #chat-box {
             flex: 1;
@@ -73,10 +88,9 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.6rem; 
             scroll-behavior: smooth;
-            /* Latar belakang polos Dark Mode, gambar dihapus */
-            background: var(--bg-secondary);
+            background: var(--bg-secondary); 
         }
 
         #chat-box::-webkit-scrollbar {
@@ -85,38 +99,38 @@
 
         .pesan-ku,
         .pesan-lawan {
-            max-width: 70%;
-            padding: 0.6rem 0.9rem;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            line-height: 1.3;
+            max-width: 80%; 
+            padding: 0.8rem 1.2rem; 
+            font-size: 1rem; 
+            line-height: 1.4; 
             position: relative;
             transition: transform 0.2s ease, box-shadow 0.2s;
             white-space: pre-wrap;
             word-wrap: break-word;
-            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            
+            background: var(--bubble-other); 
+            color: var(--text-main); 
+            border: 1px solid #EDEDED; 
+            border-radius: 8px; 
         }
 
         .pesan-ku {
             align-self: flex-end;
-            background: var(--bubble-self);
-            color: var(--text-light);
-            border-top-right-radius: 4px;
+            border-radius: 8px 4px 8px 8px; 
         }
 
         .pesan-lawan {
             align-self: flex-start;
-            background: var(--bubble-other);
-            color: var(--text-light);
-            border-top-left-radius: 4px;
+            border-radius: 4px 8px 8px 8px; 
         }
         
-        /* Gaya saat tools (hapus/balas) ditampilkan */
         .pesan-ku:hover, .pesan-lawan:hover,
         .pesan-ku.pesan-show-tools, .pesan-lawan.pesan-show-tools {
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); 
         }
 
+        /* Tombol Aksi (Hapus/Balas) */
         .hapus-btn,
         .reply-btn {
             position: absolute;
@@ -124,72 +138,84 @@
             transform: translateY(-50%);
             border: none;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 14px;
+            width: 32px; 
+            height: 32px; 
+            font-size: 15px; 
             display: none;
             cursor: pointer;
-            background: var(--accent-blue);
+            background: var(--accent-main); 
             color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background 0.2s, transform 0.1s;
         }
+        .hapus-btn:hover, .reply-btn:hover { background: #1AAE96; } 
+        .hapus-btn:active, .reply-btn:active { transform: translateY(-50%) scale(0.95); }
 
-        .hapus-btn { right: -65px; }
-        .reply-btn { right: -35px; }
-        .pesan-lawan .reply-btn { left: -35px; right: auto; }
+        .hapus-btn { right: -70px; } 
+        .reply-btn { right: -38px; } 
+        .pesan-lawan .reply-btn { left: -38px; right: auto; } 
 
-        .pesan-ku.pesan-show-tools { transform: translateX(-70px); }
-        .pesan-lawan.pesan-show-tools { transform: translateX(40px); }
+        .pesan-ku.pesan-show-tools { transform: translateX(-80px); } 
+        .pesan-lawan.pesan-show-tools { transform: translateX(45px); } 
 
         .pesan-ku.pesan-show-tools .hapus-btn,
         .pesan-ku.pesan-show-tools .reply-btn,
         .pesan-lawan.pesan-show-tools .reply-btn {
-            display: block;
+            display: flex; 
+            justify-content: center;
+            align-items: center;
         }
 
+        /* Reply Bubble Preview */
         .reply-bubble {
-            font-size: 0.8rem;
+            font-size: 0.85rem; 
             color: var(--text-subtle);
-            border-left: 3px solid var(--accent-blue);
-            padding-left: 6px;
-            margin-bottom: 4px;
+            border-left: 4px solid var(--accent-main); 
+            padding-left: 10px;
+            margin-bottom: 6px;
+            line-height: 1.3;
         }
 
         #reply-preview {
             display: none;
-            background: var(--input-field);
-            border-left: 4px solid var(--accent-blue);
-            padding: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            margin: 0 0.5rem;
+            background: var(--bg-primary);
+            border-left: 5px solid var(--accent-main); 
+            padding: 0.8rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin: 0 0.8rem 0.5rem 0.8rem;
             border-radius: 8px;
-            width: calc(100% - 1rem);
+            width: calc(100% - 1.6rem);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         #reply-preview span {
-            font-weight: bold;
-            color: var(--accent-blue);
+            font-weight: 500;
+            color: var(--accent-main);
         }
 
         #reply-preview button {
             float: right;
             background: none;
             border: none;
-            font-size: 16px;
+            font-size: 20px;
             cursor: pointer;
             color: var(--text-subtle);
+            opacity: 0.8;
+            margin-top: -5px;
         }
+        #reply-preview button:hover { color: var(--action-clear); }
+
 
         form {
             display: flex;
             align-items: flex-end;
-            padding: 0.5rem;
-            background: var(--bg-header-input);
-            border-top: 1px solid var(--border-color);
+            padding: 0.5rem 0.8rem; 
+            background: var(--bg-primary); 
+            border-top: 1px solid #EEEEEE; 
             flex-direction: column;
-            gap: 0.3rem;
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.4);
+            gap: 0.5rem; 
+            z-index: 10;
         }
 
         .input-row {
@@ -200,30 +226,35 @@
 
         textarea {
             flex: 1;
-            padding: 0.6rem 1rem;
+            padding: 0.7rem 1.5rem; 
             border: none;
-            border-radius: 25px;
+            border-radius: 20px; 
             background: var(--input-field);
-            color: var(--text-light);
+            color: var(--text-main);
             font-size: 1rem;
             outline: none;
             resize: none;
-            max-height: 120px;
-            line-height: 1.4;
+            max-height: 140px;
+            line-height: 1.5;
             overflow-y: auto;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-input);
             width: 100%; 
+            transition: box-shadow 0.3s;
+        }
+        textarea:focus {
+            box-shadow: 0 0 0 2px var(--main-accent-color); 
         }
         textarea::placeholder {
             color: var(--text-subtle);
+            font-weight: 300;
         }
         
-        /* Tombol Kirim Dihapus */
+        /* Hapus tombol submit dari aji.html */
         button[type="submit"] {
-            display: none;
+            display: none; 
         }
 
-        /* Popup konfirmasi */
+        /* Popup konfirmasi (dari vpesan.html) */
         #confirm-popup {
             display: none;
             position: fixed;
@@ -231,90 +262,94 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.3);
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
 
         #confirm-popup div {
-            background: var(--input-field);
-            color: var(--text-light);
-            padding: 20px;
-            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            padding: 25px;
+            border-radius: 12px;
             max-width: 300px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-weight: 500;
+            box-shadow: var(--shadow-soft);
         }
 
         #confirm-popup button {
-            margin: 5px;
-            padding: 8px 16px;
+            margin: 8px;
+            padding: 10px 22px;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
             color: white;
-            font-weight: bold;
-            transition: opacity 0.2s;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        #confirm-popup button:hover { opacity: 0.8; }
+        #confirm-popup button:hover { 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        #confirm-popup button:active { 
+            transform: scale(0.98);
+        }
 
         #confirm-yes { background: var(--action-clear); }
-        #confirm-no { background: #6c757d; }
+        #confirm-no { background: var(--accent-main); } 
 
-        /* Toast notifikasi */
+        /* Toast (dari vpesan.html) */
         #toast {
             visibility: hidden;
-            min-width: 250px;
-            background-color: var(--input-field);
-            color: var(--text-light);
+            min-width: 200px;
+            margin-left: -100px;
+            background: var(--text-main);
+            color: var(--bg-primary);
             text-align: center;
-            border-radius: 4px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 12px;
             position: fixed;
-            z-index: 10000;
             left: 50%;
             bottom: 30px;
-            transform: translateX(-50%);
+            z-index: 10000;
             font-size: 14px;
             opacity: 0;
             transition: opacity 0.5s, bottom 0.5s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <span>Aji Chat (Dark Mode)</span>
-        <button id="clear-btn">Hapus Semua</button>
-    </header>
-    <main id="chat-box"></main>
+    <div id="title-bar">
+        Aji Chat
+        <button id="clear-all" title="Hapus Semua Pesan">&#x1F5D1;</button>
+    </div>
     
+    <main id="chat-box"></main>
+
     <form id="chat-form" autocomplete="off">
         <div id="reply-preview"></div>
         <div class="input-row">
-            <!-- Input dengan autofocus dan pengiriman via Enter -->
             <textarea id="message-input" placeholder="Ketik pesan..." rows="1" required autofocus></textarea>
-        </div>
+            </div>
     </form>
-
-    <!-- Custom Popup Konfirmasi Hapus -->
+    
     <div id="confirm-popup">
         <div>
-            <p>Yakin mau hapus semua pesan di ruang ini?</p>
-            <button id="confirm-yes">Ya, Hapus</button>
+            <p>Yakin mau hapus semua pesan?</p>
+            <button id="confirm-yes">Ya</button>
             <button id="confirm-no">Batal</button>
         </div>
     </div>
-
-    <!-- Toast Notifikasi -->
-    <div id="toast"></div>
+    
+    <div id="toast">Semua pesan berhasil dihapus</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script>
-        // Konfigurasi Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyDXt7Jh0W-d5blhNoi3ocRdw4OyAY7fd3c",
             authDomain: "pesan-30bab.firebaseapp.com",
@@ -327,63 +362,60 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const username = "Aji";
-        const roomId = "room1";
+        // Mempertahankan konfigurasi Aji Chat
+        const username = "Aji"; 
+        const roomId = "room1"; // Digunakan untuk path Firebase
 
         const chatBox = document.getElementById("chat-box");
         const form = document.getElementById("chat-form");
         const input = document.getElementById("message-input");
         const replyPreview = document.getElementById("reply-preview");
-        const clearBtn = document.getElementById("clear-btn");
         
-        // Elemen Custom Popup & Toast
-        const popup = document.getElementById("confirm-popup");
-        const yesBtn = document.getElementById("confirm-yes");
-        const noBtn = document.getElementById("confirm-no");
-        const toast = document.getElementById("toast");
-
-
         let replyTo = null;
 
-        // Auto resize textarea
+        // Auto resize textarea (dari vpesan.html)
         input.addEventListener("input", () => {
             input.style.height = "auto";
             input.style.height = (input.scrollHeight) + "px";
         });
         
-        /**
-         * Logika Pengiriman Pesan
-         */
+        // KIRIM PESAN DENGAN TOMBOL ENTER (dari vpesan.html)
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                submitMessage();
+            }
+        });
+        
+        // Fungsi submitMessage (dari vpesan.html, disesuaikan path-nya)
         function submitMessage() {
             const message = input.value.trim();
             if (message.length > 0 && message.length <= 500) {
-                db.ref("ruang/" + roomId).push({
+                // Menggunakan path Firebase Aji Chat: ruang/room1
+                db.ref("ruang/" + roomId).push({ 
                     nama: username,
                     teks: message,
                     replyTo: replyTo,
                     waktu: Date.now()
                 });
                 
-                // Reset dan fokus otomatis
                 input.value = "";
                 input.style.height = "auto";
                 replyTo = null;
                 replyPreview.style.display = "none";
                 chatBox.scrollTop = chatBox.scrollHeight;
-                input.focus(); 
+                input.focus();
             }
         }
-
-        // MENGGANTI TOMBOL KIRIM DENGAN TOMBOL ENTER
-        input.addEventListener("keydown", (e) => {
-            // Cek jika tombol yang ditekan adalah Enter dan TIDAK bersamaan dengan Shift
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); 
-                submitMessage();
-            }
+        
+        // Form submit tidak lagi menggunakan form.requestSubmit, tapi langsung ke submitMessage
+        form.addEventListener("submit", (e) => {
+             e.preventDefault(); 
+             submitMessage();
         });
 
-        
+
+        // Fungsi pembuatan elemen pesan (Logika reply dan toggle dari vpesan.html)
         function createMessageElement(data, key) {
             const el = document.createElement("div");
             el.className = data.nama === username ? "pesan-ku" : "pesan-lawan";
@@ -392,7 +424,8 @@
             if (data.replyTo) {
                 const replyEl = document.createElement("div");
                 replyEl.className = "reply-bubble";
-                const replyerName = data.replyTo.nama === username ? "Saya" : data.replyTo.nama;
+                // Logika pemotongan teks dan nama "Saya" dari vpesan.html
+                const replyerName = data.replyTo.nama === username ? "Saya" : data.replyTo.nama; 
                 replyEl.textContent = replyerName + ": " + data.replyTo.teks.substring(0, 30) + (data.replyTo.teks.length > 30 ? "..." : "");
                 el.appendChild(replyEl);
             }
@@ -401,28 +434,32 @@
             teksEl.textContent = data.teks;
             el.appendChild(teksEl);
 
+            // Tombol Hapus (hanya untuk pesan saya)
             if (data.nama === username) {
                 const delBtn = document.createElement("button");
                 delBtn.innerHTML = "&#x2716;"; // '✖'
                 delBtn.className = "hapus-btn";
+                // Path hapus disesuaikan dengan Aji Chat
                 delBtn.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Mencegah toggle show tools saat klik hapus
-                    db.ref("ruang/" + roomId).child(key).remove();
+                    event.stopPropagation();
+                    db.ref("ruang/" + roomId).child(key).remove(); 
                 });
                 el.appendChild(delBtn);
             }
 
+            // Tombol Balas
             const replyBtn = document.createElement("button");
             replyBtn.innerHTML = "&#x21a9;"; // '↩'
             replyBtn.className = "reply-btn";
             replyBtn.addEventListener("click", (event) => {
-                event.stopPropagation(); // Mencegah toggle show tools saat klik balas
+                event.stopPropagation();
                 replyTo = {
                     nama: data.nama,
                     teks: data.teks
                 };
                 replyPreview.innerHTML = "";
                 
+                // Logika reply preview dari vpesan.html
                 const replyerName = data.nama === username ? "Saya" : data.nama;
 
                 const span = document.createElement("span");
@@ -435,16 +472,17 @@
                 cancelBtn.onclick = cancelReply;
                 replyPreview.appendChild(cancelBtn);
                 replyPreview.style.display = "block";
-                
-                // Hilangkan semua tools pesan yang sedang terbuka
-                document.querySelectorAll('.pesan-show-tools').forEach(p => p.classList.remove('pesan-show-tools'));
                 input.focus();
+                
+                // Hapus kelas show-tools dari semua pesan lain
+                document.querySelectorAll('.pesan-show-tools').forEach(p => p.classList.remove('pesan-show-tools'));
             });
             el.appendChild(replyBtn);
 
-            // Toggle show tools on click
-            el.addEventListener("click", () => {
-                // Hilangkan tools pada pesan lain
+            // Toggle show tools on click (dari vpesan.html)
+            el.addEventListener("click", (e) => {
+                if (e.target.tagName === 'BUTTON') return; 
+
                 document.querySelectorAll('.pesan-show-tools').forEach(p => {
                     if (p !== el) {
                         p.classList.remove('pesan-show-tools');
@@ -453,66 +491,64 @@
                 el.classList.toggle("pesan-show-tools");
             });
 
-
             return el;
         }
 
+        // Fungsi cancelReply (dari vpesan.html)
         function cancelReply() {
             replyTo = null;
             replyPreview.style.display = "none";
-            input.focus(); 
+            input.focus();
         }
 
-        // Perbaikan auto scroll & limit 50 pesan
+        // Logika Firebase (Disesuaikan dari aji.html dan vpesan.html)
         let firstLoad = true;
-        const pesanRef = db.ref("ruang/" + roomId).limitToLast(50);
+        const pesanRef = db.ref("ruang/" + roomId).limitToLast(50); // Menggunakan path Aji Chat
 
         pesanRef.on("child_added", (snap) => {
             const data = snap.val();
             const key = snap.key;
-            const el = createMessageElement(data, key);
-
-            // Pastikan tidak menduplikat elemen
-            if (!chatBox.querySelector(`[data-key="${key}"]`)) {
-                chatBox.appendChild(el);
+            
+            // Cek apakah elemen sudah ada
+            const el = chatBox.querySelector(`[data-key="${key}"]`);
+            if (!el) {
+                const newEl = createMessageElement(data, key);
+                chatBox.appendChild(newEl);
             }
-
+            
+            // Logika auto-scroll dan pembatasan jumlah pesan (dari vpesan.html)
             if (!firstLoad) {
                 const isUserAtBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 100;
-                // Auto scroll jika pesan baru dikirim pengguna sendiri atau jika pengguna sudah di dekat bawah
                 if (isUserAtBottom || data.nama === username) {
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }
             }
-
-            // Batasi 50 pesan di DOM
+            
+            // Batasan 50 pesan di DOM
             while (chatBox.children.length > 50) {
                 const first = chatBox.firstChild;
                 if (first && first.dataset.key) {
-                    // Hapus pesan lama dari DOM
                     first.remove();
                 }
             }
         });
 
-        // Setelah semua pesan awal selesai dimuat → scroll sekali ke bawah dan fokus
         pesanRef.once("value", () => {
             chatBox.scrollTop = chatBox.scrollHeight;
             firstLoad = false;
-            input.focus(); // Fokus otomatis saat aplikasi siap
+            input.focus(); 
         });
 
+        // Child removed handler (Menggunakan path Aji Chat)
         db.ref("ruang/" + roomId).on("child_removed", (snap) => {
             const key = snap.key;
             const el = chatBox.querySelector(`[data-key="${key}"]`);
             if (el) el.remove();
         });
 
-        
-        /**
-         * Logika Custom Toast
-         */
+        // Toast & Popup (Logika Hapus Semua dari vpesan.html)
         function showToast(msg) {
+            const toast = document.getElementById("toast");
             toast.textContent = msg;
             toast.style.visibility = "visible";
             toast.style.opacity = "1";
@@ -527,44 +563,35 @@
             }, 3000);
         }
 
-        /**
-         * Logika Custom Popup Hapus Semua
-         */
-        clearBtn.addEventListener("click", () => {
+        const popup = document.getElementById("confirm-popup");
+        const yesBtn = document.getElementById("confirm-yes");
+        const noBtn = document.getElementById("confirm-no");
+
+        // Menggunakan ID #clear-all yang baru
+        document.getElementById("clear-all").addEventListener("click", () => {
             popup.style.display = "flex";
             yesBtn.focus();
         });
 
         yesBtn.addEventListener("click", () => {
-            db.ref("ruang/" + roomId).remove()
+            // Menggunakan path Firebase Aji Chat: ruang/room1
+            db.ref("ruang/" + roomId).remove() 
                 .then(() => {
                     chatBox.innerHTML = "";
                     popup.style.display = "none";
-                    showToast("✅ Semua pesan berhasil dihapus!");
-                    input.focus(); 
-                })
-                .catch(error => {
-                    console.error("Gagal menghapus pesan:", error);
-                    showToast("❌ Gagal menghapus. Cek konsol.");
+                    showToast("✅ Semua pesan berhasil dihapus");
                 });
         });
 
         noBtn.addEventListener("click", () => {
             popup.style.display = "none";
-            input.focus(); 
+            input.focus();
         });
 
-        // Kontrol Keyboard untuk Popup
         document.addEventListener("keydown", (e) => {
             if (popup.style.display === "flex") {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    yesBtn.click();
-                }
-                if (e.key === "Escape") {
-                    e.preventDefault();
-                    noBtn.click();
-                }
+                if (e.key === "Enter") yesBtn.click();
+                if (e.key === "Escape") noBtn.click();
             }
         });
     </script>
